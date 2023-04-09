@@ -1,25 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+//Add the imports here
+import { Formik, Form, Field } from "formik";
+import { useCookies } from "react-cookie";
 
-function App() {
+const App = () => {
+  // Declare the variables here
+  const [cookies, setCookie] = useCookies(["name"]);
+  const localStorageKey = "email";
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Formik
+      initialValues={{
+        name: cookies.name || "",
+        email: localStorage.getItem(localStorageKey) || "",
+      }}
+      onSubmit={(values, { setSubmitting }) => {
+        setTimeout(() => {
+          setCookie("name", values.name, { path: "/" });
+          localStorage.setItem(localStorageKey, values.email);
+          alert(JSON.stringify(values, null, 2));
+          setSubmitting(false);
+        }, 400);
+      }}
+    >
+      {({ isSubmitting }) => (
+        <Form>
+          <label htmlFor="name">Name</label>
+          <Field type="text" name="name" />
+
+          <label htmlFor="email">Email Address</label>
+          <Field type="email" name="email" />
+
+          <button type="submit" disabled={isSubmitting}>
+            Submit
+          </button>
+        </Form>
+      )}
+    </Formik>
   );
-}
+};
 
 export default App;
